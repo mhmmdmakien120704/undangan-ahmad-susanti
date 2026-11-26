@@ -1,0 +1,464 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #f6efe6;
+    color: #5c2a24;
+    display: flex;
+    justify-content: center;
+    min-height: 100dvh;
+}
+
+body.lock-scroll {
+    overflow: hidden;
+    height: 100dvh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Latar belakang blur saat dibuka di Laptop */
+.desktop-backdrop {
+    position: fixed;
+    inset: 0;
+    background: url('sampul.jpg') center/cover no-repeat;
+    filter: blur(28px) brightness(0.45);
+    transform: scale(1.1);
+    z-index: 0;
+}
+
+/* Bingkai Utama */
+.app-frame {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    min-height: 100dvh;
+    background: #f6efe6;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+/* --- SAMPUL GAMBAR --- */
+.cover-section {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    height: 100dvh;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6efe6;
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.cover-section.fade-out {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.03);
+    pointer-events: none;
+}
+
+/* Dibuat 100% penuh mengikuti tinggi dan lebar layar */
+.cover-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Menggunakan cover agar penuh dari ujung atas ke bawah tanpa ruang kosong */
+.media-full {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* NAMA TAMU (Tepat di bawah tulisan "Dear") */
+.guest-name-text {
+    position: absolute;
+    top: 69.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    text-align: center;
+    font-size: clamp(1rem, 4.2vw, 1.3rem);
+    font-weight: bold;
+    color: #5c2a24;
+    letter-spacing: 0.4px;
+    line-height: 1.3;
+    pointer-events: none;
+}
+
+/* AREA KLIK TRANSPARAN (Tepat di gambar tombol marun "BUKA UNDANGAN") */
+.invisible-open-btn {
+    position: absolute;
+    top: 79%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 65%;
+    height: 6.5%;
+    border-radius: 50px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.invisible-open-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- SLIDE VIDEO BERTUMPUK --- */
+.main-invitation {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Video standar (1080x1920 / rasio 9:16 - Utuh 100% tanpa potong di semua layar HP) */
+.video-slide {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    position: relative;
+    overflow: hidden;
+    background: #f6efe6;
+}
+
+.scroll-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+}
+
+/* Video panjang (1080x3840 / rasio 9:32 / 2x tinggi layar) */
+.video-slide.tall-slide {
+    height: auto;
+    aspect-ratio: 9 / 32;
+}
+
+.video-slide.tall-slide .scroll-video {
+    height: auto;
+    object-fit: contain;
+}
+
+/* Video kotak (1080x1080 / rasio 1:1) */
+.video-slide.square-slide {
+    height: auto;
+    aspect-ratio: 1 / 1;
+}
+
+.video-slide.square-slide .scroll-video {
+    height: auto;
+    object-fit: contain;
+}
+
+/* --- POSISI ANGKA COUNTDOWN DI DALAM 4 KOTAK MARUN (VIDEO 4) --- */
+.countdown-overlay {
+    position: absolute;
+    top: 78.9%;
+    left: 49%;
+    transform: translate(-50%, -50%);
+    width: 92%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.2%;
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.cd-num {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    animation: fadeInCountdown 1.2s ease forwards;
+}
+
+@keyframes fadeInCountdown {
+
+    0%,
+    40% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* --- AREA KLIK TRANSPARAN LOKASI GOOGLE MAPS (VIDEO 5 & 6) --- */
+.invisible-map-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 45%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 99;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.invisible-map-btn:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* --- AREA KLIK TRANSPARAN TOMBOL COPY (VIDEO 8 - WEDDING GIFT) --- */
+.invisible-copy-btn {
+    position: absolute;
+    top: 71.5%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    width: 16%;
+    height: 7.5%;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 50;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.invisible-copy-btn:active {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Notifikasi Melayang saat Nomor Rekening Tersalin */
+.copy-toast {
+    position: fixed;
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #5c2a24;
+    color: #ffffff;
+    padding: 0.7rem 1.3rem;
+    border-radius: 50px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Tombol Musik Melayang */
+.music-btn {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    right: max(20px, calc(50vw - 220px));
+    z-index: 500;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(92, 42, 36, 0.8);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+/* --- WIDGET UCAPAN SELAMAT & RSVP (VIDEO 9) --- */
+.rsvp-widget {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 82%;
+    height: 62%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.9rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    z-index: 20;
+}
+
+.comment-count {
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #5c2a24;
+    margin-bottom: 0.65rem;
+}
+
+/* Kotak Hadir & Tidak Hadir */
+.rsvp-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+}
+
+.stat-box {
+    padding: 0.55rem 0.4rem;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-box strong {
+    font-size: 1.15rem;
+    line-height: 1.2;
+}
+
+.stat-box span {
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.stat-box.hadir {
+    background: #d9f2d9;
+    color: #1e6b2b;
+}
+
+.stat-box.tidak-hadir {
+    background: #f9c6c9;
+    color: #9e2329;
+}
+
+/* Form Input */
+.rsvp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.rsvp-form input,
+.rsvp-form textarea,
+.rsvp-form select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border-radius: 7px;
+    border: 1px solid rgba(92, 42, 36, 0.25);
+    background: rgba(255, 255, 255, 0.88);
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: #3b1c18;
+    outline: none;
+}
+
+.rsvp-form input:focus,
+.rsvp-form textarea:focus,
+.rsvp-form select:focus {
+    border-color: #5c2a24;
+    background: #ffffff;
+}
+
+.rsvp-form textarea {
+    resize: none;
+}
+
+.btn-kirim {
+    width: 100%;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 7px;
+    background: #5c2a24;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-kirim:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Daftar Komentar (Bisa di-scroll ke bawah) */
+.comment-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-right: 4px;
+    border-top: 1px solid rgba(92, 42, 36, 0.15);
+    padding-top: 0.65rem;
+}
+
+.comment-item {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.55rem 0.7rem;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.comment-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #5c2a24;
+}
+
+.badge-status {
+    font-size: 0.62rem;
+    padding: 2px 6px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.badge-status.Hadir {
+    background: #d9f2d9;
+    color: #1e6b2b;
+}
+
+.badge-status.Tidak {
+    background: #f9c6c9;
+    color: #9e2329;
+}
+
+.comment-text {
+    font-size: 0.78rem;
+    color: #333;
+    line-height: 1.35;
+    margin-bottom: 0.2rem;
+}
+
+.comment-time {
+    font-size: 0.65rem;
+    color: #888;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #777;
+}
