@@ -144,7 +144,7 @@ body.lock-scroll {
     will-change: transform;
 }
 
-/* Video panjang (1080x3840 / rasio 9:32 / 2x tinggi layar) */
+/* Video panjang (rasio 9:32 / 2x tinggi layar) */
 .video-slide.tall-slide {
     height: auto;
     aspect-ratio: 9 / 32;
@@ -221,6 +221,121 @@ body.lock-scroll {
 
 .invisible-map-btn:active {
     background: rgba(255, 255, 255, 0.15);
+}
+
+/* --- AREA KLIK TRANSPARAN & POPUP LIGHTBOX GALERI (VIDEO 7) --- */
+.gallery-hotspots {
+    position: absolute;
+    top: 17.5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 86%;
+    height: 77%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5%;
+    z-index: 30;
+}
+
+.gallery-spot:last-child {
+    grid-column: span 2;
+}
+
+.gallery-spot {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.gallery-spot:active {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.gallery-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.gallery-modal-img {
+    max-width: 92%;
+    max-height: 80dvh;
+    border-radius: 10px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    object-fit: contain;
+    animation: zoomInPhoto 0.25s ease;
+}
+
+@keyframes zoomInPhoto {
+    from {
+        transform: scale(0.92);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.gallery-close-btn {
+    position: absolute;
+    top: calc(18px + env(safe-area-inset-top));
+    right: 18px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 0.5rem 0.95rem;
+    border-radius: 50px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 2010;
+}
+
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2010;
+}
+
+.gallery-nav-btn.prev {
+    left: 12px;
+}
+
+.gallery-nav-btn.next {
+    right: 12px;
+}
+
+.gallery-counter {
+    position: absolute;
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.85);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
 }
 
 /* --- AREA KLIK TRANSPARAN TOMBOL COPY (VIDEO 8 - WEDDING GIFT) --- */

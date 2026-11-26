@@ -55,7 +55,7 @@
                 <video class="scroll-video" src="2.mp4" muted playsinline preload="auto"></video>
             </section>
 
-            <!-- Video 3 (Ukuran panjang 1080x3840) -->
+            <!-- Video 3 (Ukuran panjang) -->
             <section class="video-slide tall-slide">
                 <video class="scroll-video" src="3.mp4" muted playsinline preload="none"></video>
             </section>
@@ -91,9 +91,22 @@
                     aria-label="Buka Lokasi Acara di Google Maps"></button>
             </section>
 
-            <!-- Video 7 (Ukuran panjang 1080x3840) -->
+            <!-- Video 7 (Ukuran panjang - Our Gallery + 9 Area Klik Foto) -->
             <section class="video-slide tall-slide">
                 <video class="scroll-video" src="7.mp4" muted playsinline preload="none"></video>
+
+                <!-- 9 Tombol Transparan tepat di atas posisi ke-9 foto di video -->
+                <div class="gallery-hotspots">
+                    <button type="button" class="gallery-spot" data-index="0" aria-label="Lihat Foto 1"></button>
+                    <button type="button" class="gallery-spot" data-index="1" aria-label="Lihat Foto 2"></button>
+                    <button type="button" class="gallery-spot" data-index="2" aria-label="Lihat Foto 3"></button>
+                    <button type="button" class="gallery-spot" data-index="3" aria-label="Lihat Foto 4"></button>
+                    <button type="button" class="gallery-spot" data-index="4" aria-label="Lihat Foto 5"></button>
+                    <button type="button" class="gallery-spot" data-index="5" aria-label="Lihat Foto 6"></button>
+                    <button type="button" class="gallery-spot" data-index="6" aria-label="Lihat Foto 7"></button>
+                    <button type="button" class="gallery-spot" data-index="7" aria-label="Lihat Foto 8"></button>
+                    <button type="button" class="gallery-spot" data-index="8" aria-label="Lihat Foto 9"></button>
+                </div>
             </section>
 
             <!-- Video 8 (Ukuran kotak 1080x1080 - Wedding Gift + Tombol Copy Rekening) -->
@@ -105,7 +118,7 @@
                     aria-label="Salin Nomor Rekening"></button>
             </section>
 
-            <!-- Video 9 (Ukuran panjang 1080x3840 + Widget Ucapan & RSVP) -->
+            <!-- Video 9 (Ukuran panjang + Widget Ucapan & RSVP) -->
             <section class="video-slide tall-slide">
                 <video class="scroll-video" src="9.mp4" muted playsinline preload="none"></video>
 
@@ -153,6 +166,18 @@
 
         <!-- Notifikasi Toast saat nomor rekening disalin -->
         <div id="copyToast" class="copy-toast">Nomor rekening disalin: 1660004094181</div>
+
+        <!-- Popup Lightbox saat Foto Galeri Diklik -->
+        <div id="galleryModal" class="gallery-modal hidden">
+            <button type="button" id="closeGalleryBtn" class="gallery-close-btn" aria-label="Tutup Foto">✕
+                Kembali</button>
+            <button type="button" id="prevGalleryBtn" class="gallery-nav-btn prev"
+                aria-label="Foto Sebelumnya">‹</button>
+            <img id="galleryModalImg" src="" alt="Preview Foto Galeri" class="gallery-modal-img" />
+            <button type="button" id="nextGalleryBtn" class="gallery-nav-btn next"
+                aria-label="Foto Berikutnya">›</button>
+            <div id="galleryCounter" class="gallery-counter">1 / 9</div>
+        </div>
 
     </div>
 

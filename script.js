@@ -15,12 +15,30 @@ const videos = Array.from(document.querySelectorAll('.scroll-video'));
 
 let isPlaying = false;
 
-// Muat 1 video berikutnya secara berantai agar jaringan & RAM HP tetap ringan
-function preloadNextVideo(currentIndex) {
-    const nextVideo = videos[currentIndex + 1];
-    if (nextVideo && nextVideo.preload !== 'auto') {
-        nextVideo.preload = 'auto';
-        nextVideo.load();
+// Muat 2 video berikutnya secara berantai agar jaringan & RAM HP tetap ringan
+function preloadNextVideos(currentIndex) {
+    for (let i = 1; i <= 2; i++) {
+        const nextVideo = videos[currentIndex + i];
+        if (nextVideo && nextVideo.preload !== 'auto') {
+            nextVideo.preload = 'auto';
+            nextVideo.load();
+        }
+    }
+}
+
+// Fungsi aman untuk memutar video (memastikan frame muncul & tidak kosong)
+function safePlayVideo(video) {
+    if (video.readyState < 2) {
+        video.preload = 'auto';
+        video.load();
+    }
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(() => {
+            setTimeout(() => {
+                video.play().catch(() => { });
+            }, 300);
+        });
     }
 }
 
@@ -42,11 +60,11 @@ openBtn.addEventListener('click', () => {
         musicToggle.classList.remove('hidden');
     }).catch(() => { });
 
-    // Langsung putar Video 1 saat sampul terbuka & siapkan Video 2
+    // Langsung putar Video 1 saat sampul terbuka & siapkan Video 2-3
     if (videos.length > 0 && !videos[0].dataset.played) {
         videos[0].dataset.played = 'true';
-        videos[0].play().catch(() => { });
-        preloadNextVideo(0);
+        safePlayVideo(videos[0]);
+        preloadNextVideos(0);
     }
 });
 
@@ -65,28 +83,27 @@ musicToggle.addEventListener('click', () => {
 // 3. DETEKSI VIDEO SAAT TAMPIL DI LAYAR (Putar 1x lalu stay di frame akhir)
 const observerOptions = {
     root: null,
-    rootMargin: '250px 0px 250px 0px',
-    threshold: 0.05
+    rootMargin: '500px 0px 500px 0px',
+    threshold: 0.01
 };
 
-const videoObserver = new IntersectionObserver((entries, observer) => {
+const videoObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
         const video = entry.target;
         const index = videos.indexOf(video);
 
-        // Jika video masuk ke layar dan BELUM pernah diputar sebelumnya
-        if (entry.isIntersecting && !video.dataset.played) {
-            video.dataset.played = 'true';
-            video.preload = 'auto';
-            video.play().catch(() => { });
+        if (entry.isIntersecting) {
+            if (!video.dataset.played) {
+                video.dataset.played = 'true';
+                safePlayVideo(video);
 
-            // Siapkan video selanjutnya di latar belakang
-            if (index !== -1) {
-                preloadNextVideo(index);
+                if (index !== -1) {
+                    preloadNextVideos(index);
+                }
+            } else if (video.readyState < 2) {
+                video.load();
+                video.currentTime = video.duration || 0;
             }
-
-            // Berhenti memantau video ini agar tidak reset/loop saat di-scroll ulang
-            observer.unobserve(video);
         }
     });
 }, observerOptions);
@@ -136,18 +153,14 @@ if (copyRekBtn) {
 
         const noRek = copyRekBtn.getAttribute('data-rekening');
 
-        // 1. Gunakan Clipboard API modern terlebih dahulu (100% tanpa keyboard di Vercel/HTTPS)
         if (navigator.clipboard && window.isSecureContext) {
             try {
                 await navigator.clipboard.writeText(noRek);
                 showToast();
                 return;
-            } catch (err) {
-                // Lanjut ke fallback jika diblokir browser
-            }
+            } catch (err) { }
         }
 
-        // 2. Fallback aman untuk HTTP lokal/localhost (readonly + tanpa focus() agar keyboard tidak muncul)
         const textArea = document.createElement('textarea');
         textArea.value = noRek;
         textArea.setAttribute('readonly', '');
@@ -158,7 +171,6 @@ if (copyRekBtn) {
         textArea.style.left = '-9999px';
         document.body.appendChild(textArea);
 
-        // Khusus iOS Safari & Android tanpa memicu keyboard
         const selection = document.getSelection();
         const range = document.createRange();
         range.selectNodeContents(textArea);
@@ -196,12 +208,10 @@ const countHadirEl = document.getElementById('countHadir');
 const countTidakHadirEl = document.getElementById('countTidakHadir');
 const submitRsvpBtn = document.getElementById('submitRsvpBtn');
 
-// Otomatis isi kolom Nama jika tamu membuka link pakai ?guest=NamaTamu
 if (guestParam && document.getElementById('inputNama')) {
     document.getElementById('inputNama').value = guestParam;
 }
 
-// Ambil dan tampilkan seluruh ucapan dari Google Sheets
 async function loadComments() {
     if (!SCRIPT_URL.startsWith('http')) {
         commentList.innerHTML = '<p class="loading-text">Belum terhubung ke Google Sheets.</p>';
@@ -246,7 +256,6 @@ async function loadComments() {
     }
 }
 
-// Kirim ucapan baru
 if (rsvpForm) {
     rsvpForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -271,7 +280,6 @@ if (rsvpForm) {
             document.getElementById('inputUcapan').value = '';
             document.getElementById('inputKehadiran').value = '';
 
-            // Muat ulang daftar komentar setelah 1 detik
             setTimeout(loadComments, 1000);
         } catch (err) {
             alert('Terjadi kesalahan saat mengirim ucapan.');
@@ -288,7 +296,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Muat komentar saat halaman pertama kali dibuka
 loadComments();
 
 // 7. LOGIKA BUKA GOOGLE MAPS (VIDEO 5 & VIDEO 6)
@@ -304,4 +311,87 @@ mapButtons.forEach((btn) => {
             window.open(mapUrl, '_blank', 'noopener,noreferrer');
         }
     });
+});
+
+// 8. LOGIKA LIGHTBOX POPUP GALERI FOTO (VIDEO 7)
+const galleryImages = [
+    'galeri1.jpeg',
+    'galeri2.jpeg',
+    'galeri4.jpeg',
+    'galeri5.jpeg',
+    'galeri6.jpeg',
+];
+
+const galleryModal = document.getElementById('galleryModal');
+const galleryModalImg = document.getElementById('galleryModalImg');
+const galleryCounter = document.getElementById('galleryCounter');
+const closeGalleryBtn = document.getElementById('closeGalleryBtn');
+const prevGalleryBtn = document.getElementById('prevGalleryBtn');
+const nextGalleryBtn = document.getElementById('nextGalleryBtn');
+const gallerySpots = document.querySelectorAll('.gallery-spot');
+
+let currentPhotoIndex = 0;
+
+function openGalleryModal(index, pushState = true) {
+    currentPhotoIndex = index;
+    galleryModalImg.src = galleryImages[currentPhotoIndex];
+    galleryCounter.textContent = `${currentPhotoIndex + 1} / ${galleryImages.length}`;
+    galleryModal.classList.remove('hidden');
+
+    if (pushState) {
+        history.pushState({ galleryOpen: true }, '');
+    }
+}
+
+function closeGalleryModal(fromPopState = false) {
+    if (galleryModal.classList.contains('hidden')) return;
+    galleryModal.classList.add('hidden');
+    galleryModalImg.src = '';
+
+    if (!fromPopState && history.state && history.state.galleryOpen) {
+        history.back();
+    }
+}
+
+gallerySpots.forEach((spot) => {
+    spot.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const index = parseInt(spot.getAttribute('data-index'), 10);
+        openGalleryModal(index);
+    });
+});
+
+if (closeGalleryBtn) {
+    closeGalleryBtn.addEventListener('click', () => closeGalleryModal(false));
+}
+
+if (galleryModal) {
+    galleryModal.addEventListener('click', (e) => {
+        if (e.target === galleryModal) {
+            closeGalleryModal(false);
+        }
+    });
+}
+
+if (prevGalleryBtn) {
+    prevGalleryBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentPhotoIndex = (currentPhotoIndex - 1 + galleryImages.length) % galleryImages.length;
+        openGalleryModal(currentPhotoIndex, false);
+    });
+}
+
+if (nextGalleryBtn) {
+    nextGalleryBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentPhotoIndex = (currentPhotoIndex + 1) % galleryImages.length;
+        openGalleryModal(currentPhotoIndex, false);
+    });
+}
+
+window.addEventListener('popstate', () => {
+    if (galleryModal && !galleryModal.classList.contains('hidden')) {
+        closeGalleryModal(true);
+    }
 });
