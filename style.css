@@ -140,6 +140,8 @@ body.lock-scroll {
     object-fit: contain;
     display: block;
     pointer-events: none;
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 /* Video panjang (1080x3840 / rasio 9:32 / 2x tinggi layar) */

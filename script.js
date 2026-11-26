@@ -11,9 +11,18 @@ const mainInvitation = document.getElementById('mainInvitation');
 const openBtn = document.getElementById('openBtn');
 const bgMusic = document.getElementById('bgMusic');
 const musicToggle = document.getElementById('musicToggle');
-const videos = document.querySelectorAll('.scroll-video');
+const videos = Array.from(document.querySelectorAll('.scroll-video'));
 
 let isPlaying = false;
+
+// Muat 1 video berikutnya secara berantai agar jaringan & RAM HP tetap ringan
+function preloadNextVideo(currentIndex) {
+    const nextVideo = videos[currentIndex + 1];
+    if (nextVideo && nextVideo.preload !== 'auto') {
+        nextVideo.preload = 'auto';
+        nextVideo.load();
+    }
+}
 
 openBtn.addEventListener('click', () => {
     // Tampilkan daftar video & buka kunci scroll
@@ -33,10 +42,11 @@ openBtn.addEventListener('click', () => {
         musicToggle.classList.remove('hidden');
     }).catch(() => { });
 
-    // Langsung putar Video 1 saat sampul terbuka & tandai sudah diputar
+    // Langsung putar Video 1 saat sampul terbuka & siapkan Video 2
     if (videos.length > 0 && !videos[0].dataset.played) {
         videos[0].dataset.played = 'true';
         videos[0].play().catch(() => { });
+        preloadNextVideo(0);
     }
 });
 
@@ -55,18 +65,25 @@ musicToggle.addEventListener('click', () => {
 // 3. DETEKSI VIDEO SAAT TAMPIL DI LAYAR (Putar 1x lalu stay di frame akhir)
 const observerOptions = {
     root: null,
-    threshold: 0.25
+    rootMargin: '250px 0px 250px 0px',
+    threshold: 0.05
 };
 
 const videoObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
         const video = entry.target;
+        const index = videos.indexOf(video);
 
         // Jika video masuk ke layar dan BELUM pernah diputar sebelumnya
         if (entry.isIntersecting && !video.dataset.played) {
             video.dataset.played = 'true';
-            video.currentTime = 0;
+            video.preload = 'auto';
             video.play().catch(() => { });
+
+            // Siapkan video selanjutnya di latar belakang
+            if (index !== -1) {
+                preloadNextVideo(index);
+            }
 
             // Berhenti memantau video ini agar tidak reset/loop saat di-scroll ulang
             observer.unobserve(video);
